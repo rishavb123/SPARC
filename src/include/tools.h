@@ -533,4 +533,22 @@ void FFTW_MDiFFT_real(int *dim_sizes, double _Complex *c2r_3dinput, double *c2r_
  */
 double expint(const int n, const double x);
 
+/**
+ * @brief Gather a distributed vector (domain paral) to the root process.
+ * 
+ * @param vec_local The local part of the vector.
+ * @param DMVerts Domain vertices of the local vector.
+ * @param vec_global The global vector (only used in the root process).
+ * @param gridsizes The global grid sizes.
+ * @param comm_topo The communicator where the vector is distributed (embeded
+ *                  with a 3D Cartesian topology).
+ * @param isCopy Flag to indicate whether to copy vec_local to vec_global in
+ *               the special case when comm_topo has only 1 process.
+ * @return int Error handle,
+ *             -1: comm_topo is NULL, 0: copy sucess, 1: use vec_local directly.
+ */
+int gather_distributed_vector(
+    const double *vec_local, const int DMVerts[6], double *vec_global,
+    const int gridsizes[3], MPI_Comm comm_topo, const int isCopy)
+
 #endif // TOOL_H
