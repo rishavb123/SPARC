@@ -555,6 +555,7 @@ void scf(SPARC_OBJ *pSPARC)
             Exact_Exchange_loop(pSPARC);
         }
         // TODO: RBHAGAT8 --> save pSPARC->XCPotential the same way that
+        printXCPotential(pSPARC);
     } else {
         // usefock >=2 scf with exact exchange
         pSPARC->usefock ++;

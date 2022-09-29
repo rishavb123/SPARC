@@ -29,6 +29,25 @@
 
 
 /**
+ * @brief   Print the XC potential.
+ */
+void printXCPotential(SPARC_OBJ *pSPARC) {
+    char *fname = "xc_potential.csv";
+    FILE *output_fp = fopen(fname,"w");
+    if (output_fp == NULL) {
+        printf("\nCannot open file \"%s\"\n",fname);
+        exit(EXIT_FAILURE);
+    } 
+
+    fprintf(output_fp, "i,XC_potential[i]");
+
+    for (int i = 0; i < pSPARC->Nd_d; i++)
+        fprintf(output_fp, "%d,%d\n", i, pSPARC->XCPotential[i]);
+
+    fclose(output_fp);
+}
+
+/**
  * @brief   Print initial electron density guess and converged density.
  */
 void printElecDens(SPARC_OBJ *pSPARC) {
