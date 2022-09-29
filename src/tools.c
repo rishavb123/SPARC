@@ -2533,18 +2533,6 @@ int gather_distributed_vector(
     const double *vec_local, const int DMVerts[6], double *vec_global,
     const int gridsizes[3], MPI_Comm comm_topo, const int isCopy)
 {
-    /* 
-        pSPARC->XCPotential // local vector
-        pSPARC->DMVertices // DM Verts
-        vec_global
-        int gridsizes[3] = {pSPARC->Nx, pSPARC->Ny, pSPARC->Nz};
-        comm_topo; pSPARC->dmcomm_phi // communicator for vector in phi domain
-        isCopy = 1
-
-        do global stuff on rank 0; get the rank with :
-        int rank;
-        MPI_Comm_rank(pSPARC->dmcomm_phi, &rank);
-    */
     if (comm_topo == MPI_COMM_NULL) return -1;
     int info = 0;
     // get information about the communicator (topology)
