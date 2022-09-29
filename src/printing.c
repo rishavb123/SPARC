@@ -32,19 +32,34 @@
  * @brief   Print the XC potential.
  */
 void printXCPotential(SPARC_OBJ *pSPARC) {
-    char *fname = "xc_potential.csv";
-    FILE *output_fp = fopen(fname,"w");
-    if (output_fp == NULL) {
-        printf("\nCannot open file \"%s\"\n",fname);
-        exit(EXIT_FAILURE);
-    } 
+    int rank; // Initialize processor rank int
+    MPI_Comm_rank(pSPARC->dmcomm_phi, &rank); // Get the processor rank using MPI function
 
-    fprintf(output_fp, "i,XC_potential[i]");
+    double* globalXCPotential;
+    if (rank == 0) {
+        globalXCPotential = (double *) (pSPARC->Nd * sizeof(double));
+        assert(globalXCPotential != NULL);
+    }
 
-    for (int i = 0; i < pSPARC->Nd_d; i++)
-        fprintf(output_fp, "%d,%d\n", i, pSPARC->XCPotential[i]);
+    int gridsizes[3] = {pSPARC->Nx, pSPARC->Ny, pSPARC->Nz};
+    gather_distributed_vector(pSPARC->XCPotential, pSPARC->DMVertices, globalXCPotential, gridsizes, pSPARC->dmcomm_phi, 1);
 
-    fclose(output_fp);
+    if (rank == 0) {
+        char *fname = "xc_potential.csv";
+
+        FILE *output_fp = fopen(fname,"w");
+        if (output_fp == NULL) {
+            printf("\nCannot open file \"%s\"\n",fname);
+            exit(EXIT_FAILURE);
+        } 
+
+        fprintf(output_fp, "i,XC Potential[i]\n");
+
+        for (int i = 0; i < pSPARC->Nd; i++)
+            fprintf(output_fp, "%d,%d\n", i, globalXCPotential[i]);
+
+        fclose(output_fp);
+    }
 }
 
 /**
