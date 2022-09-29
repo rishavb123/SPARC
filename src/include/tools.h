@@ -549,6 +549,6 @@ double expint(const int n, const double x);
  */
 int gather_distributed_vector(
     const double *vec_local, const int DMVerts[6], double *vec_global,
-    const int gridsizes[3], MPI_Comm comm_topo, const int isCopy)
+    const int gridsizes[3], MPI_Comm comm_topo, const int isCopy);
 
 #endif // TOOL_H
