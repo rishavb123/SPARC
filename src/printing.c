@@ -37,7 +37,7 @@ void printXCPotential(SPARC_OBJ *pSPARC) {
 
     double* globalXCPotential;
     if (rank == 0) {
-        globalXCPotential = (double *) (pSPARC->Nd * sizeof(double));
+        globalXCPotential = (double *) malloc(pSPARC->Nd * sizeof(double));
         assert(globalXCPotential != NULL);
     }
 
@@ -53,10 +53,16 @@ void printXCPotential(SPARC_OBJ *pSPARC) {
             exit(EXIT_FAILURE);
         } 
 
-        fprintf(output_fp, "i,XC Potential[i]\n");
+        fprintf(output_fp, "i,x,y,z,XC Potential[i]\n");
 
-        for (int i = 0; i < pSPARC->Nd; i++)
-            fprintf(output_fp, "%d,%d\n", i, globalXCPotential[i]);
+        for (int i = 0; i < pSPARC->Nd; i++) {
+            int tempI = i;
+            int z = tempI / (pSPARC->Ny * pSPARC->Nx);
+            tempI = tempI % (pSPARC->Ny * pSPARC->Nx);
+            int y = tempI / pSPARC->Nx;
+            int x = tempI % pSPARC->Nx;
+            fprintf(output_fp, "%d,%d,%d,%d,%.15f\n", i, x, y, z, globalXCPotential[i]);
+        }
 
         fclose(output_fp);
     }
