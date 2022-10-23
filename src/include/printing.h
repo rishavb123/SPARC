@@ -16,9 +16,14 @@
 #include "isddft.h"
 
 /**
- * @brief   Print the XC potential.
+ * @brief   Print the XC potential as a csv file.
  */
 void printXCPotential(SPARC_OBJ *pSPARC);
+
+/**
+ * @brief   Print the electron density as a csv file.
+ */
+void printElecDensCSV(SPARC_OBJ *pSPARC);
 
 /**
  * @brief   Print initial electron density guess and converged density.

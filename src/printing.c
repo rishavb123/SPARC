@@ -29,7 +29,7 @@
 
 
 /**
- * @brief   Print the XC potential.
+ * @brief   Print the XC potential as a csv file.
  */
 void printXCPotential(SPARC_OBJ *pSPARC) {
     int rank; // Initialize processor rank int
@@ -67,6 +67,48 @@ void printXCPotential(SPARC_OBJ *pSPARC) {
         fclose(output_fp);
     }
 }
+
+
+/**
+ * @brief   Print the electron density as a csv file.
+ */
+void printElecDensCSV(SPARC_OBJ *pSPARC) {
+    int rank; // Initialize processor rank int
+    MPI_Comm_rank(pSPARC->dmcomm_phi, &rank); // Get the processor rank using MPI function
+
+    double* globalElectronDens;
+    if (rank == 0) {
+        globalElectronDens = (double *) malloc(pSPARC->Nd * sizeof(double));
+        assert(globalElectronDens != NULL);
+    }
+
+    int gridsizes[3] = {pSPARC->Nx, pSPARC->Ny, pSPARC->Nz};
+    gather_distributed_vector(pSPARC->electronDens_at, pSPARC->DMVertices, globalElectronDens, gridsizes, pSPARC->dmcomm_phi, 1);
+
+    if (rank == 0) {
+        char *fname = "electron_density.csv";
+
+        FILE *output_fp = fopen(fname,"w");
+        if (output_fp == NULL) {
+            printf("\nCannot open file \"%s\"\n",fname);
+            exit(EXIT_FAILURE);
+        } 
+
+        fprintf(output_fp, "i,x,y,z,Electron Density[i]\n");
+
+        for (int i = 0; i < pSPARC->Nd; i++) {
+            int tempI = i;
+            int z = tempI / (pSPARC->Ny * pSPARC->Nx);
+            tempI = tempI % (pSPARC->Ny * pSPARC->Nx);
+            int y = tempI / pSPARC->Nx;
+            int x = tempI % pSPARC->Nx;
+            fprintf(output_fp, "%d,%d,%d,%d,%.15f\n", i, x, y, z, globalElectronDens[i]);
+        }
+
+        fclose(output_fp);
+    }
+}
+
 
 /**
  * @brief   Print initial electron density guess and converged density.
